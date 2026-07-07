@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BackHeader from '../../components/BackHeader';
@@ -8,22 +8,30 @@ import ReminderRow from '../../components/ReminderRow';
 import TimeField from '../../components/TimeField';
 import { useProfile } from '../../context/ProfileContext';
 import { useReminders } from '../../context/RemindersContext';
-import { colors, radius, spacing, typography } from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
+import { radius, spacing, typography, ThemeColors } from '../../constants/theme';
 import { Reminder, ReminderSound } from '../../types';
 
 export default function RemindersScreen() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const { profile, updateProfile } = useProfile();
   const { reminders, addReminder, editReminder, toggleReminder, removeReminder } = useReminders();
   const [editing, setEditing] = useState<Reminder | null>(null);
   const [creating, setCreating] = useState(false);
   const [muteEnabled, setMuteEnabled] = useState(!!(profile?.mute_start && profile?.mute_end));
 
-  const handleSave = async (data: { time: string; days_of_week: number[]; sound: ReminderSound }) => {
+  const handleSave = async (data: {
+    time: string;
+    days_of_week: number[];
+    sound: ReminderSound;
+    message: string | null;
+  }) => {
     try {
       if (editing) {
         await editReminder(editing.id, data);
       } else {
-        await addReminder(data.time, data.days_of_week, data.sound);
+        await addReminder(data.time, data.days_of_week, data.sound, data.message);
       }
     } catch (e: any) {
       Alert.alert('Could not save reminder', e.message ?? 'Please try again.');
@@ -147,28 +155,30 @@ export default function RemindersScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
-  title: { ...typography.h2, color: colors.text, marginBottom: spacing.md },
-  card: { marginBottom: spacing.md },
-  sectionTitle: { ...typography.h3, color: colors.text },
-  empty: { ...typography.body, color: colors.textMuted, paddingVertical: spacing.sm },
-  addBtn: { paddingVertical: spacing.md, alignItems: 'center' },
-  addBtnText: { ...typography.bodyBold, color: colors.primary },
-  muteHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  toggle: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.pill,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  toggleActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  toggleText: { ...typography.bodyBold, color: colors.textMuted, fontSize: 13 },
-  toggleTextActive: { color: colors.textOnPrimary },
-  muteRow: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.md },
-  muteField: { flex: 1 },
-  mutedHint: { ...typography.caption, color: colors.textMuted, marginTop: spacing.sm },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
+    title: { ...typography.h2, color: colors.text, marginBottom: spacing.md },
+    card: { marginBottom: spacing.md },
+    sectionTitle: { ...typography.h3, color: colors.text },
+    empty: { ...typography.body, color: colors.textMuted, paddingVertical: spacing.sm },
+    addBtn: { paddingVertical: spacing.md, alignItems: 'center' },
+    addBtnText: { ...typography.bodyBold, color: colors.primary },
+    muteHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    toggle: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+      borderRadius: radius.pill,
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    toggleActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+    toggleText: { ...typography.bodyBold, color: colors.textMuted, fontSize: 13 },
+    toggleTextActive: { color: colors.textOnPrimary },
+    muteRow: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.md },
+    muteField: { flex: 1 },
+    mutedHint: { ...typography.caption, color: colors.textMuted, marginTop: spacing.sm },
+  });
+}

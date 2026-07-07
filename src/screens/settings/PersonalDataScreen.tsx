@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -15,8 +15,9 @@ import Button from '../../components/Button';
 import Card from '../../components/Card';
 import TextField from '../../components/TextField';
 import { useProfile } from '../../context/ProfileContext';
+import { useTheme } from '../../context/ThemeContext';
 import { calculateSuggestedGoalMl } from '../../services/goal';
-import { colors, radius, spacing, typography } from '../../constants/theme';
+import { radius, spacing, typography, ThemeColors } from '../../constants/theme';
 import { Gender } from '../../types';
 import { displayAmount, ozToMl } from '../../utils/units';
 
@@ -27,6 +28,8 @@ const GENDERS: { key: Gender; label: string }[] = [
 ];
 
 export default function PersonalDataScreen() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const { profile, updateProfile } = useProfile();
   const unit = profile?.unit ?? 'ml';
 
@@ -126,24 +129,26 @@ export default function PersonalDataScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  flex: { flex: 1 },
-  scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
-  title: { ...typography.h2, color: colors.text, marginBottom: spacing.md },
-  card: { marginBottom: spacing.lg },
-  label: { ...typography.caption, color: colors.textMuted, marginBottom: spacing.sm },
-  row: { flexDirection: 'row', marginBottom: spacing.md, gap: spacing.sm },
-  pill: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.pill,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  pillActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  pillText: { ...typography.bodyBold, color: colors.textMuted },
-  pillTextActive: { color: colors.textOnPrimary },
-  recalcBtn: { marginTop: spacing.xs },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    flex: { flex: 1 },
+    scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
+    title: { ...typography.h2, color: colors.text, marginBottom: spacing.md },
+    card: { marginBottom: spacing.lg },
+    label: { ...typography.caption, color: colors.textMuted, marginBottom: spacing.sm },
+    row: { flexDirection: 'row', marginBottom: spacing.md, gap: spacing.sm },
+    pill: {
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: radius.pill,
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    pillActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+    pillText: { ...typography.bodyBold, color: colors.textMuted },
+    pillTextActive: { color: colors.textOnPrimary },
+    recalcBtn: { marginTop: spacing.xs },
+  });
+}

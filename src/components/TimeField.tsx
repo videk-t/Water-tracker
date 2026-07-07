@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { colors, radius, spacing, typography } from '../constants/theme';
+import { radius, spacing, typography, ThemeColors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 
 interface TimeFieldProps {
   label?: string;
@@ -27,6 +28,8 @@ function displayTime(date: Date): string {
 }
 
 export default function TimeField({ label, value, onChange }: TimeFieldProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const [showIOSPicker, setShowIOSPicker] = useState(false);
   const date = parseTime(value);
 
@@ -66,16 +69,18 @@ export default function TimeField({ label, value, onChange }: TimeFieldProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  label: { ...typography.caption, color: colors.textMuted, marginBottom: spacing.xs },
-  field: {
-    backgroundColor: colors.background,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-  },
-  value: { ...typography.bodyBold, color: colors.text },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    label: { ...typography.caption, color: colors.textMuted, marginBottom: spacing.xs },
+    field: {
+      backgroundColor: colors.background,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      alignItems: 'center',
+    },
+    value: { ...typography.bodyBold, color: colors.text },
+  });
+}

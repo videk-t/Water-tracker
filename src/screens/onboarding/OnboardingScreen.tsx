@@ -15,8 +15,9 @@ import Card from '../../components/Card';
 import Mascot from '../../components/Mascot';
 import TextField from '../../components/TextField';
 import { useProfile } from '../../context/ProfileContext';
+import { useTheme } from '../../context/ThemeContext';
 import { calculateSuggestedGoalMl } from '../../services/goal';
-import { colors, radius, spacing, typography } from '../../constants/theme';
+import { radius, spacing, typography, ThemeColors } from '../../constants/theme';
 import { Gender, Unit } from '../../types';
 import { displayAmount } from '../../utils/units';
 
@@ -27,6 +28,8 @@ const GENDERS: { key: Gender; label: string }[] = [
 ];
 
 export default function OnboardingScreen() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const { updateProfile } = useProfile();
   const [gender, setGender] = useState<Gender>('female');
   const [weight, setWeight] = useState('');
@@ -143,36 +146,38 @@ export default function OnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  flex: { flex: 1 },
-  scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
-  hero: { alignItems: 'center', marginBottom: spacing.lg },
-  title: { ...typography.h2, color: colors.text, marginTop: spacing.sm },
-  subtitle: {
-    ...typography.body,
-    color: colors.textMuted,
-    textAlign: 'center',
-    marginTop: spacing.xs,
-    paddingHorizontal: spacing.md,
-  },
-  card: { marginBottom: spacing.md },
-  sectionLabel: { ...typography.caption, color: colors.textMuted, marginBottom: spacing.sm },
-  row: { flexDirection: 'row', marginBottom: spacing.md, gap: spacing.sm },
-  pill: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.pill,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  pillActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  pillText: { ...typography.bodyBold, color: colors.textMuted },
-  pillTextActive: { color: colors.textOnPrimary },
-  goalCard: { alignItems: 'center', backgroundColor: colors.primary, marginBottom: spacing.lg },
-  goalLabel: { ...typography.body, color: colors.textOnPrimary, opacity: 0.85 },
-  goalValue: { ...typography.h1, color: colors.textOnPrimary, marginTop: spacing.xs },
-  goalHint: { ...typography.caption, color: colors.textOnPrimary, opacity: 0.8, marginTop: spacing.xs },
-  cta: { marginTop: spacing.sm },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    flex: { flex: 1 },
+    scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
+    hero: { alignItems: 'center', marginBottom: spacing.lg },
+    title: { ...typography.h2, color: colors.text, marginTop: spacing.sm },
+    subtitle: {
+      ...typography.body,
+      color: colors.textMuted,
+      textAlign: 'center',
+      marginTop: spacing.xs,
+      paddingHorizontal: spacing.md,
+    },
+    card: { marginBottom: spacing.md },
+    sectionLabel: { ...typography.caption, color: colors.textMuted, marginBottom: spacing.sm },
+    row: { flexDirection: 'row', marginBottom: spacing.md, gap: spacing.sm },
+    pill: {
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: radius.pill,
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    pillActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+    pillText: { ...typography.bodyBold, color: colors.textMuted },
+    pillTextActive: { color: colors.textOnPrimary },
+    goalCard: { alignItems: 'center', backgroundColor: colors.primary, marginBottom: spacing.lg },
+    goalLabel: { ...typography.body, color: colors.textOnPrimary, opacity: 0.85 },
+    goalValue: { ...typography.h1, color: colors.textOnPrimary, marginTop: spacing.xs },
+    goalHint: { ...typography.caption, color: colors.textOnPrimary, opacity: 0.8, marginTop: spacing.xs },
+    cta: { marginTop: spacing.sm },
+  });
+}

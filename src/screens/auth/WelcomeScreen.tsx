@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Button from '../../components/Button';
 import Mascot from '../../components/Mascot';
 import { useAuth } from '../../context/AuthContext';
-import { colors, spacing, typography } from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
+import { spacing, typography, ThemeColors } from '../../constants/theme';
 import { AuthStackParamList } from '../../navigation/types';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Welcome'>;
 
 export default function WelcomeScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const { signInAnonymously } = useAuth();
   const [loading, setLoading] = useState(false);
 
@@ -53,17 +56,19 @@ export default function WelcomeScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, justifyContent: 'space-between' },
-  hero: { alignItems: 'center', marginTop: spacing.xxl * 1.5 },
-  title: { ...typography.h1, color: colors.text, marginTop: spacing.md },
-  subtitle: {
-    ...typography.body,
-    color: colors.textMuted,
-    marginTop: spacing.sm,
-    textAlign: 'center',
-    paddingHorizontal: spacing.xl,
-  },
-  actions: { padding: spacing.lg, paddingBottom: spacing.xl },
-  spaced: { marginTop: spacing.sm },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background, justifyContent: 'space-between' },
+    hero: { alignItems: 'center', marginTop: spacing.xxl * 1.5 },
+    title: { ...typography.h1, color: colors.text, marginTop: spacing.md },
+    subtitle: {
+      ...typography.body,
+      color: colors.textMuted,
+      marginTop: spacing.sm,
+      textAlign: 'center',
+      paddingHorizontal: spacing.xl,
+    },
+    actions: { padding: spacing.lg, paddingBottom: spacing.xl },
+    spaced: { marginTop: spacing.sm },
+  });
+}

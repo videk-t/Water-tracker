@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
-import { colors, spacing, typography } from '../constants/theme';
+import { spacing, typography, ThemeColors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 import { WEEKDAY_LABELS } from '../constants/cupSizes';
 import { Reminder } from '../types';
 
@@ -25,11 +26,18 @@ interface ReminderRowProps {
 }
 
 export default function ReminderRow({ reminder, onPress, onToggle }: ReminderRowProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   return (
     <TouchableOpacity style={styles.row} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.info}>
         <Text style={styles.time}>{displayTime(reminder.time)}</Text>
         <Text style={styles.days}>{summarizeDays(reminder.days_of_week)}</Text>
+        {reminder.message ? (
+          <Text style={styles.message} numberOfLines={1}>
+            "{reminder.message}"
+          </Text>
+        ) : null}
       </View>
       <Switch
         value={reminder.enabled}
@@ -41,16 +49,19 @@ export default function ReminderRow({ reminder, onPress, onToggle }: ReminderRow
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  info: {},
-  time: { ...typography.h3, color: colors.text },
-  days: { ...typography.caption, color: colors.textMuted, marginTop: 2 },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    info: { flex: 1, marginRight: spacing.sm },
+    time: { ...typography.h3, color: colors.text },
+    days: { ...typography.caption, color: colors.textMuted, marginTop: 2 },
+    message: { ...typography.caption, color: colors.primary, marginTop: 2, fontStyle: 'italic' },
+  });
+}

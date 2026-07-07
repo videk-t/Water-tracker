@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Line, Rect } from 'react-native-svg';
-import { colors, radius, typography } from '../constants/theme';
+import { typography, ThemeColors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 import { DayBucket } from '../services/stats';
 
 interface BarChartProps {
@@ -14,10 +15,12 @@ interface BarChartProps {
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 export default function BarChart({ buckets, goalMl, width = 320, height = 180 }: BarChartProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const paddingBottom = 24;
   const paddingTop = 12;
   const chartHeight = height - paddingBottom - paddingTop;
-  const maxValue = Math.max(goalMl, ...buckets.map((b) => b.totalMl), 1);
+  const maxValue = Math.max(goalMl, ...buckets.map((b) => b.hydrationMl), 1);
 
   const barCount = buckets.length;
   const gap = 10;
@@ -37,10 +40,13 @@ export default function BarChart({ buckets, goalMl, width = 320, height = 180 }:
           strokeDasharray="4 4"
         />
         {buckets.map((bucket, i) => {
-          const barHeight = Math.max((bucket.totalMl / maxValue) * chartHeight, bucket.totalMl > 0 ? 4 : 0);
+          const barHeight = Math.max(
+            (bucket.hydrationMl / maxValue) * chartHeight,
+            bucket.hydrationMl > 0 ? 4 : 0
+          );
           const x = i * (barWidth + gap);
           const y = paddingTop + chartHeight - barHeight;
-          const met = goalMl > 0 && bucket.totalMl >= goalMl;
+          const met = goalMl > 0 && bucket.hydrationMl >= goalMl;
           return (
             <Rect
               key={i}
@@ -65,7 +71,9 @@ export default function BarChart({ buckets, goalMl, width = 320, height = 180 }:
   );
 }
 
-const styles = StyleSheet.create({
-  labelRow: { flexDirection: 'row', marginTop: 4 },
-  label: { ...typography.caption, color: colors.textMuted, textAlign: 'center' },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    labelRow: { flexDirection: 'row', marginTop: 4 },
+    label: { ...typography.caption, color: colors.textMuted, textAlign: 'center' },
+  });
+}

@@ -1,8 +1,10 @@
+import { hydrationValueMl } from '../constants/drinks';
 import { IntakeLog } from '../types';
 
 export interface DayBucket {
   date: Date;
   totalMl: number;
+  hydrationMl: number;
   drinkCount: number;
 }
 
@@ -19,7 +21,7 @@ export function bucketByDay(logs: IntakeLog[], days: number): DayBucket[] {
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
-    buckets.push({ date: d, totalMl: 0, drinkCount: 0 });
+    buckets.push({ date: d, totalMl: 0, hydrationMl: 0, drinkCount: 0 });
   }
 
   const byKey = new Map(buckets.map((b) => [dateKey(b.date), b]));
@@ -27,6 +29,7 @@ export function bucketByDay(logs: IntakeLog[], days: number): DayBucket[] {
     const bucket = byKey.get(dateKey(new Date(log.logged_at)));
     if (bucket) {
       bucket.totalMl += log.amount_ml;
+      bucket.hydrationMl += hydrationValueMl(log.amount_ml, log.drink_type);
       bucket.drinkCount += 1;
     }
   }
@@ -46,7 +49,7 @@ export function summarize(buckets: DayBucket[], goalMl: number): SummaryStats {
   }
   const totalMl = buckets.reduce((sum, b) => sum + b.totalMl, 0);
   const totalDrinks = buckets.reduce((sum, b) => sum + b.drinkCount, 0);
-  const daysGoalMet = buckets.filter((b) => goalMl > 0 && b.totalMl >= goalMl).length;
+  const daysGoalMet = buckets.filter((b) => goalMl > 0 && b.hydrationMl >= goalMl).length;
 
   return {
     averageMl: totalMl / buckets.length,

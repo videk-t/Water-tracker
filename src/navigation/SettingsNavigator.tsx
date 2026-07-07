@@ -3,12 +3,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SettingsHomeScreen from '../screens/settings/SettingsHomeScreen';
 import RemindersScreen from '../screens/settings/RemindersScreen';
 import PersonalDataScreen from '../screens/settings/PersonalDataScreen';
-import { colors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 import { SettingsStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<SettingsStackParamList>();
 
 export default function SettingsNavigator() {
+  const { colors } = useTheme();
   return (
     <Stack.Navigator
       screenOptions={{

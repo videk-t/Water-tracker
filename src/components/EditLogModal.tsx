@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
 import Button from './Button';
 import TextField from './TextField';
-import { colors, radius, spacing, typography } from '../constants/theme';
+import { radius, spacing, typography, ThemeColors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 import { IntakeLog, Unit } from '../types';
 import { displayAmount, ozToMl } from '../utils/units';
 
@@ -15,6 +16,8 @@ interface EditLogModalProps {
 }
 
 export default function EditLogModal({ visible, log, unit, onClose, onSave }: EditLogModalProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const [value, setValue] = useState('');
 
   useEffect(() => {
@@ -52,21 +55,23 @@ export default function EditLogModal({ visible, log, unit, onClose, onSave }: Ed
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(27,42,74,0.4)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.lg,
-  },
-  sheet: {
-    width: '100%',
-    backgroundColor: colors.card,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-  },
-  title: { ...typography.h3, color: colors.text, marginBottom: spacing.md },
-  actions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xs },
-  actionBtn: { flex: 1 },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    backdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(27,42,74,0.4)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: spacing.lg,
+    },
+    sheet: {
+      width: '100%',
+      backgroundColor: colors.card,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+    },
+    title: { ...typography.h3, color: colors.text, marginBottom: spacing.md },
+    actions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xs },
+    actionBtn: { flex: 1 },
+  });
+}

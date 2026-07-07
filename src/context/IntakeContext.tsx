@@ -6,14 +6,16 @@ import {
   fetchTodayLogs,
   updateIntakeLog,
 } from '../services/intake';
-import { IntakeLog } from '../types';
+import { hydrationValueMl } from '../constants/drinks';
+import { DrinkType, IntakeLog } from '../types';
 
 interface IntakeContextValue {
   todayLogs: IntakeLog[];
   todayTotalMl: number;
+  todayHydrationMl: number;
   loading: boolean;
   refresh: () => Promise<void>;
-  addLog: (amountMl: number) => Promise<void>;
+  addLog: (amountMl: number, drinkType?: DrinkType) => Promise<IntakeLog>;
   editLog: (id: string, amountMl: number) => Promise<void>;
   removeLog: (id: string) => Promise<void>;
 }
@@ -46,10 +48,11 @@ export function IntakeProvider({ children }: { children: React.ReactNode }) {
   }, [refresh]);
 
   const addLog = useCallback(
-    async (amountMl: number) => {
-      if (!userId) return;
-      const log = await addIntakeLog(userId, amountMl);
+    async (amountMl: number, drinkType: DrinkType = 'water') => {
+      if (!userId) throw new Error('Not signed in');
+      const log = await addIntakeLog(userId, amountMl, drinkType);
       setTodayLogs((prev) => [log, ...prev]);
+      return log;
     },
     [userId]
   );
@@ -69,9 +72,23 @@ export function IntakeProvider({ children }: { children: React.ReactNode }) {
     [todayLogs]
   );
 
+  const todayHydrationMl = useMemo(
+    () => todayLogs.reduce((sum, l) => sum + hydrationValueMl(l.amount_ml, l.drink_type), 0),
+    [todayLogs]
+  );
+
   const value = useMemo<IntakeContextValue>(
-    () => ({ todayLogs, todayTotalMl, loading, refresh, addLog, editLog, removeLog }),
-    [todayLogs, todayTotalMl, loading, refresh, addLog, editLog, removeLog]
+    () => ({
+      todayLogs,
+      todayTotalMl,
+      todayHydrationMl,
+      loading,
+      refresh,
+      addLog,
+      editLog,
+      removeLog,
+    }),
+    [todayLogs, todayTotalMl, todayHydrationMl, loading, refresh, addLog, editLog, removeLog]
   );
 
   return <IntakeContext.Provider value={value}>{children}</IntakeContext.Provider>;

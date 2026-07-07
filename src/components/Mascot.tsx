@@ -1,6 +1,6 @@
 import React from 'react';
 import Svg, { Circle, Path } from 'react-native-svg';
-import { colors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 
 export type MascotMood = 'happy' | 'excited' | 'sleepy' | 'thirsty' | 'proud';
 
@@ -10,6 +10,7 @@ interface MascotProps {
 }
 
 export default function Mascot({ size = 96, mood = 'happy' }: MascotProps) {
+  const { colors } = useTheme();
   const w = size;
   const h = size * 1.15;
 

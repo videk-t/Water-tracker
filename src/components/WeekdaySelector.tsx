@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { WEEKDAY_LABELS } from '../constants/cupSizes';
-import { colors, radius, spacing, typography } from '../constants/theme';
+import { radius, spacing, typography, ThemeColors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 
 interface WeekdaySelectorProps {
   selected: number[];
@@ -9,6 +10,9 @@ interface WeekdaySelectorProps {
 }
 
 export default function WeekdaySelector({ selected, onChange }: WeekdaySelectorProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
+
   const toggle = (day: number) => {
     if (selected.includes(day)) {
       onChange(selected.filter((d) => d !== day));
@@ -35,19 +39,21 @@ export default function WeekdaySelector({ selected, onChange }: WeekdaySelectorP
   );
 }
 
-const styles = StyleSheet.create({
-  row: { flexDirection: 'row', justifyContent: 'space-between' },
-  dayBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: radius.pill,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  dayBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  dayText: { ...typography.bodyBold, color: colors.textMuted, fontSize: 13 },
-  dayTextActive: { color: colors.textOnPrimary },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    row: { flexDirection: 'row', justifyContent: 'space-between' },
+    dayBtn: {
+      width: 34,
+      height: 34,
+      borderRadius: radius.pill,
+      backgroundColor: colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    dayBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+    dayText: { ...typography.bodyBold, color: colors.textMuted, fontSize: 13 },
+    dayTextActive: { color: colors.textOnPrimary },
+  });
+}

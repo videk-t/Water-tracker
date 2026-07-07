@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { colors, radius, spacing, typography } from '../constants/theme';
+import { radius, spacing, typography, ThemeColors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
+import { DRINK_TYPES } from '../constants/drinks';
 import { IntakeLog, Unit } from '../types';
 import { displayAmount } from '../utils/units';
 
@@ -17,6 +19,9 @@ function formatTime(iso: string): string {
 }
 
 export default function TodayLogList({ logs, unit, onEdit, onDelete }: TodayLogListProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
+
   if (logs.length === 0) {
     return (
       <View style={styles.empty}>
@@ -35,7 +40,7 @@ export default function TodayLogList({ logs, unit, onEdit, onDelete }: TodayLogL
           onPress={() => onEdit(log)}
           onLongPress={() => onDelete(log)}
         >
-          <View style={styles.dot} />
+          <Text style={styles.emoji}>{DRINK_TYPES[log.drink_type].emoji}</Text>
           <Text style={styles.amount}>
             {displayAmount(log.amount_ml, unit)}
             {unit}
@@ -50,32 +55,28 @@ export default function TodayLogList({ logs, unit, onEdit, onDelete }: TodayLogL
   );
 }
 
-const styles = StyleSheet.create({
-  empty: { paddingVertical: spacing.lg, alignItems: 'center' },
-  emptyText: { ...typography.body, color: colors.textMuted },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: radius.pill,
-    backgroundColor: colors.accent,
-    marginRight: spacing.sm,
-  },
-  amount: { ...typography.bodyBold, color: colors.text, flex: 1 },
-  time: { ...typography.caption, color: colors.textMuted, marginRight: spacing.sm },
-  deleteBtn: {
-    width: 24,
-    height: 24,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background,
-  },
-  deleteText: { color: colors.danger, fontSize: 16, fontWeight: '700', marginTop: -2 },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    empty: { paddingVertical: spacing.lg, alignItems: 'center' },
+    emptyText: { ...typography.body, color: colors.textMuted },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    emoji: { fontSize: 18, marginRight: spacing.sm },
+    amount: { ...typography.bodyBold, color: colors.text, flex: 1 },
+    time: { ...typography.caption, color: colors.textMuted, marginRight: spacing.sm },
+    deleteBtn: {
+      width: 24,
+      height: 24,
+      borderRadius: radius.pill,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.background,
+    },
+    deleteText: { color: colors.danger, fontSize: 16, fontWeight: '700', marginTop: -2 },
+  });
+}

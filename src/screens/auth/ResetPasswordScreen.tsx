@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Button from '../../components/Button';
 import TextField from '../../components/TextField';
 import { useAuth } from '../../context/AuthContext';
-import { colors, spacing, typography } from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
+import { spacing, typography, ThemeColors } from '../../constants/theme';
 import { AuthStackParamList } from '../../navigation/types';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'ResetPassword'>;
 
 export default function ResetPasswordScreen({ route, navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const { confirmPasswordReset } = useAuth();
   const { email } = route.params;
   const [otp, setOtp] = useState('');
@@ -76,12 +79,14 @@ export default function ResetPasswordScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  flex: { flex: 1 },
-  content: { flex: 1, padding: spacing.lg, justifyContent: 'center' },
-  title: { ...typography.h1, color: colors.text },
-  subtitle: { ...typography.body, color: colors.textMuted, marginTop: spacing.xs, marginBottom: spacing.lg },
-  form: { marginTop: spacing.md },
-  spaced: { marginTop: spacing.sm },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    flex: { flex: 1 },
+    content: { flex: 1, padding: spacing.lg, justifyContent: 'center' },
+    title: { ...typography.h1, color: colors.text },
+    subtitle: { ...typography.body, color: colors.textMuted, marginTop: spacing.xs, marginBottom: spacing.lg },
+    form: { marginTop: spacing.md },
+    spaced: { marginTop: spacing.sm },
+  });
+}

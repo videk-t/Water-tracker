@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { IntakeLog } from '../types';
+import { DrinkType, IntakeLog } from '../types';
 
 export function startOfDayIso(date: Date = new Date()): string {
   const d = new Date(date);
@@ -34,15 +34,46 @@ export async function fetchTodayLogs(userId: string): Promise<IntakeLog[]> {
   return fetchLogsBetween(userId, startOfDayIso(), endOfDayIso());
 }
 
-export async function addIntakeLog(userId: string, amountMl: number): Promise<IntakeLog> {
+export async function addIntakeLog(
+  userId: string,
+  amountMl: number,
+  drinkType: DrinkType = 'water'
+): Promise<IntakeLog> {
   const { data, error } = await supabase
     .from('intake_logs')
-    .insert({ user_id: userId, amount_ml: amountMl, logged_at: new Date().toISOString() })
+    .insert({
+      user_id: userId,
+      amount_ml: amountMl,
+      drink_type: drinkType,
+      logged_at: new Date().toISOString(),
+    })
     .select()
     .single();
 
   if (error) throw error;
   return data;
+}
+
+export async function fetchTotalLogCount(userId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from('intake_logs')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  return count ?? 0;
+}
+
+export async function fetchLogsSince(userId: string, sinceIso: string): Promise<IntakeLog[]> {
+  const { data, error } = await supabase
+    .from('intake_logs')
+    .select('*')
+    .eq('user_id', userId)
+    .gte('logged_at', sinceIso)
+    .order('logged_at', { ascending: false });
+
+  if (error) throw error;
+  return data ?? [];
 }
 
 export async function updateIntakeLog(id: string, amountMl: number): Promise<IntakeLog> {

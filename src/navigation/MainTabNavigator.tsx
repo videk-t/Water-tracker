@@ -5,13 +5,14 @@ import TabIcon from '../components/TabIcon';
 import HomeScreen from '../screens/home/HomeScreen';
 import HistoryScreen from '../screens/history/HistoryScreen';
 import SettingsNavigator from './SettingsNavigator';
-import { colors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 import { MainTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabNavigator() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const bottomInset = Math.max(insets.bottom, 12);
 
   return (

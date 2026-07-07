@@ -15,6 +15,15 @@ A water intake tracker built with Expo, React Native, and Supabase.
   calendar-dot streak view
 - Settings: reminder management, sound picker, Auto/Manual reminder mode,
   unit toggle (ml/oz), personal data, sign out
+- Custom drink types (water/coffee/tea/soda/juice/alcohol) with realistic
+  hydration-weighted scoring toward your goal
+- Daily streaks and unlockable achievements (first drop, streak milestones,
+  perfect week, century club, early bird, night owl, and more)
+- Personalized insights on the History screen (weekday vs weekend, trend vs
+  last week, best day/time) generated from your own data, plus a CSV export
+- Full light/dark theming (System/Light/Dark) across the entire app
+- Optional custom text per reminder notification, falling back to a rotating
+  pool of default messages
 
 ## Setup
 

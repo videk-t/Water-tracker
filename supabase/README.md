@@ -21,3 +21,8 @@
    `Your code is: {{ .Token }}`) instead of relying solely on `{{ .ConfirmationURL }}`. Without
    this change, `ForgotPasswordScreen` will send an email but the code shown in
    `ResetPasswordScreen` won't match anything.
+6. **If your project already has the original schema applied** (i.e. you set this up before
+   the v2 feature update — custom drinks, achievements, dark mode, custom reminder messages),
+   run `migrations/002_v2_features.sql` in the SQL editor to add the new columns/table without
+   touching your existing data. Fresh projects can just run `schema.sql`, which already
+   includes everything.

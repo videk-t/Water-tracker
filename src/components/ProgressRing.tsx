@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
-import { colors, typography } from '../constants/theme';
+import { typography, ThemeColors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 import { Unit } from '../types';
 import { displayAmount } from '../utils/units';
 
@@ -20,6 +21,8 @@ export default function ProgressRing({
   size = 220,
   strokeWidth = 18,
 }: ProgressRingProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const progress = goalMl > 0 ? Math.min(currentMl / goalMl, 1) : 0;
@@ -71,9 +74,11 @@ export default function ProgressRing({
   );
 }
 
-const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  amount: { ...typography.h1, fontSize: 32, color: colors.text },
-  goalText: { ...typography.h3, color: colors.textMuted },
-  percent: { ...typography.caption, color: colors.textMuted, marginTop: 4 },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    amount: { ...typography.h1, fontSize: 32, color: colors.text },
+    goalText: { ...typography.h3, color: colors.textMuted },
+    percent: { ...typography.caption, color: colors.textMuted, marginTop: 4 },
+  });
+}

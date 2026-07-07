@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import { pickDefaultMessage } from '../constants/reminderMessages';
 import { Profile, Reminder } from '../types';
 
 Notifications.setNotificationHandler({
@@ -74,11 +75,13 @@ export async function syncScheduledReminders(
 
     if (isMuted({ hour, minute }, profile)) continue;
 
+    const body = reminder.message?.trim() || pickDefaultMessage(reminder.id);
+
     for (const weekday of reminder.days_of_week) {
       await Notifications.scheduleNotificationAsync({
         content: {
           title: 'Time to hydrate 💧',
-          body: "Let's drink some water!",
+          body,
           categoryIdentifier: HYDRATION_CATEGORY,
           sound: reminder.sound === 'none' ? undefined : 'default',
         },

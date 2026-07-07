@@ -24,6 +24,7 @@ create table if not exists public.profiles (
   mute_end time,
   further_reminder boolean not null default true,
   onboarding_completed boolean not null default false,
+  theme text not null check (theme in ('system', 'light', 'dark')) default 'system',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -32,12 +33,14 @@ comment on table public.profiles is 'Per-user HydroTrack profile & settings, one
 
 -- ============================================================
 -- intake_logs
--- Every logged drink of water.
+-- Every logged drink. drink_type drives the hydration multiplier
+-- applied client-side (see src/constants/drinks.ts).
 -- ============================================================
 create table if not exists public.intake_logs (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid not null references auth.users (id) on delete cascade,
   amount_ml integer not null check (amount_ml > 0),
+  drink_type text not null check (drink_type in ('water', 'coffee', 'tea', 'soda', 'juice', 'alcohol')) default 'water',
   logged_at timestamptz not null default now(),
   created_at timestamptz not null default now()
 );
@@ -47,7 +50,9 @@ create index if not exists intake_logs_user_id_logged_at_idx
 
 -- ============================================================
 -- reminders
--- Local-notification schedule, synced across devices.
+-- Local-notification schedule, synced across devices. `message` is an
+-- optional custom notification body; null falls back to a rotating
+-- pool of default messages (see src/constants/reminderMessages.ts).
 -- ============================================================
 create table if not exists public.reminders (
   id uuid primary key default uuid_generate_v4(),
@@ -56,11 +61,27 @@ create table if not exists public.reminders (
   days_of_week integer[] not null default '{0,1,2,3,4,5,6}',
   enabled boolean not null default true,
   sound text not null default 'default',
+  message text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 create index if not exists reminders_user_id_idx on public.reminders (user_id);
+
+-- ============================================================
+-- achievements
+-- Unlocked badges, one row per (user, achievement_key). The catalog
+-- of possible keys lives in src/constants/achievements.ts.
+-- ============================================================
+create table if not exists public.achievements (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  achievement_key text not null,
+  unlocked_at timestamptz not null default now(),
+  unique (user_id, achievement_key)
+);
+
+create index if not exists achievements_user_id_idx on public.achievements (user_id);
 
 -- ============================================================
 -- updated_at triggers
@@ -113,6 +134,7 @@ create trigger on_auth_user_created
 alter table public.profiles enable row level security;
 alter table public.intake_logs enable row level security;
 alter table public.reminders enable row level security;
+alter table public.achievements enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own" on public.profiles
@@ -160,4 +182,16 @@ create policy "reminders_update_own" on public.reminders
 
 drop policy if exists "reminders_delete_own" on public.reminders;
 create policy "reminders_delete_own" on public.reminders
+  for delete using (auth.uid() = user_id);
+
+drop policy if exists "achievements_select_own" on public.achievements;
+create policy "achievements_select_own" on public.achievements
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "achievements_insert_own" on public.achievements;
+create policy "achievements_insert_own" on public.achievements
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "achievements_delete_own" on public.achievements;
+create policy "achievements_delete_own" on public.achievements
   for delete using (auth.uid() = user_id);

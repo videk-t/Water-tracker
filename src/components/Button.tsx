@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   ActivityIndicator,
   GestureResponderEvent,
@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   ViewStyle,
 } from 'react-native';
-import { colors, radius, typography } from '../constants/theme';
+import { radius, typography, ThemeColors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 
 interface ButtonProps {
   label: string;
@@ -26,6 +27,8 @@ export default function Button({
   loading,
   style,
 }: ButtonProps) {
+  const { colors } = useTheme();
+  const { styles, variantStyles, labelVariantStyles } = useMemo(() => getStyles(colors), [colors]);
   const isDisabled = disabled || loading;
   return (
     <TouchableOpacity
@@ -43,33 +46,37 @@ export default function Button({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    height: 52,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  label: {
-    ...typography.bodyBold,
-    fontSize: 16,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-});
+function getStyles(colors: ThemeColors) {
+  const styles = StyleSheet.create({
+    base: {
+      height: 52,
+      borderRadius: radius.pill,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 24,
+    },
+    label: {
+      ...typography.bodyBold,
+      fontSize: 16,
+    },
+    disabled: {
+      opacity: 0.5,
+    },
+  });
 
-const variantStyles = StyleSheet.create({
-  primary: { backgroundColor: colors.primary },
-  secondary: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
-  ghost: { backgroundColor: 'transparent' },
-  danger: { backgroundColor: colors.danger },
-});
+  const variantStyles = StyleSheet.create({
+    primary: { backgroundColor: colors.primary },
+    secondary: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+    ghost: { backgroundColor: 'transparent' },
+    danger: { backgroundColor: colors.danger },
+  });
 
-const labelVariantStyles = StyleSheet.create({
-  primary: { color: colors.textOnPrimary },
-  secondary: { color: colors.primary },
-  ghost: { color: colors.primary },
-  danger: { color: colors.textOnPrimary },
-});
+  const labelVariantStyles = StyleSheet.create({
+    primary: { color: colors.textOnPrimary },
+    secondary: { color: colors.primary },
+    ghost: { color: colors.primary },
+    danger: { color: colors.textOnPrimary },
+  });
+
+  return { styles, variantStyles, labelVariantStyles };
+}

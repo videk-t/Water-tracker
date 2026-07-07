@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -6,18 +6,22 @@ import Card from '../../components/Card';
 import { useAuth } from '../../context/AuthContext';
 import { useProfile } from '../../context/ProfileContext';
 import { useReminders } from '../../context/RemindersContext';
+import { useTheme } from '../../context/ThemeContext';
 import { ALL_DAYS } from '../../constants/cupSizes';
 import { generateAutoScheduleTimes } from '../../services/reminders';
-import { colors, radius, spacing, typography } from '../../constants/theme';
-import { ReminderMode, Unit } from '../../types';
+import { radius, spacing, typography, ThemeColors } from '../../constants/theme';
+import { ReminderMode, ThemePreference, Unit } from '../../types';
 import { SettingsStackParamList } from '../../navigation/types';
 
 type Props = NativeStackScreenProps<SettingsStackParamList, 'SettingsHome'>;
 
 export default function SettingsHomeScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const { session, signOut } = useAuth();
   const { profile, updateProfile } = useProfile();
   const { reminders, addReminder } = useReminders();
+  const { preference, setPreference } = useTheme();
   const [switchingMode, setSwitchingMode] = useState(false);
 
   const handleUnitChange = (unit: Unit) => updateProfile({ unit });
@@ -54,6 +58,15 @@ export default function SettingsHomeScreen({ navigation }: Props) {
         <Card style={styles.card}>
           <SettingsLink title="Reminder Schedule" subtitle={`${reminders.length} reminder(s)`} onPress={() => navigation.navigate('Reminders')} />
           <SettingsLink title="Personal Data" subtitle="Gender, weight, height, goal" onPress={() => navigation.navigate('PersonalData')} />
+        </Card>
+
+        <Card style={styles.card}>
+          <Text style={styles.sectionLabel}>Appearance</Text>
+          <View style={styles.row}>
+            <ModePill label="System" active={preference === 'system'} onPress={() => setPreference('system')} />
+            <ModePill label="Light" active={preference === 'light'} onPress={() => setPreference('light')} />
+            <ModePill label="Dark" active={preference === 'dark'} onPress={() => setPreference('dark')} />
+          </View>
         </Card>
 
         <Card style={styles.card}>
@@ -107,6 +120,8 @@ export default function SettingsHomeScreen({ navigation }: Props) {
 }
 
 function SettingsLink({ title, subtitle, onPress }: { title: string; subtitle: string; onPress: () => void }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   return (
     <TouchableOpacity style={styles.link} onPress={onPress}>
       <View>
@@ -129,6 +144,8 @@ function ModePill({
   onPress: () => void;
   disabled?: boolean;
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   return (
     <TouchableOpacity
       style={[styles.pill, active && styles.pillActive]}
@@ -140,39 +157,41 @@ function ModePill({
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scroll: { padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xxl },
-  title: { ...typography.h2, color: colors.text, marginBottom: spacing.md },
-  card: { marginBottom: spacing.md },
-  sectionLabel: { ...typography.caption, color: colors.textMuted, marginBottom: spacing.sm },
-  row: { flexDirection: 'row', gap: spacing.sm },
-  pill: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.pill,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  pillActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  pillText: { ...typography.bodyBold, color: colors.textMuted },
-  pillTextActive: { color: colors.textOnPrimary },
-  hint: { ...typography.caption, color: colors.textMuted, marginTop: spacing.sm },
-  link: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-  },
-  linkTitle: { ...typography.bodyBold, color: colors.text },
-  linkSubtitle: { ...typography.caption, color: colors.textMuted, marginTop: 2 },
-  chevron: { ...typography.h2, color: colors.textMuted },
-  accountEmail: { ...typography.body, color: colors.text },
-  signOutBtn: {
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    marginTop: spacing.sm,
-  },
-  signOutText: { ...typography.bodyBold, color: colors.danger },
-});
+function getStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    scroll: { padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xxl },
+    title: { ...typography.h2, color: colors.text, marginBottom: spacing.md },
+    card: { marginBottom: spacing.md },
+    sectionLabel: { ...typography.caption, color: colors.textMuted, marginBottom: spacing.sm },
+    row: { flexDirection: 'row', gap: spacing.sm },
+    pill: {
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: radius.pill,
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    pillActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+    pillText: { ...typography.bodyBold, color: colors.textMuted },
+    pillTextActive: { color: colors.textOnPrimary },
+    hint: { ...typography.caption, color: colors.textMuted, marginTop: spacing.sm },
+    link: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: spacing.sm,
+    },
+    linkTitle: { ...typography.bodyBold, color: colors.text },
+    linkSubtitle: { ...typography.caption, color: colors.textMuted, marginTop: 2 },
+    chevron: { ...typography.h2, color: colors.textMuted },
+    accountEmail: { ...typography.body, color: colors.text },
+    signOutBtn: {
+      alignItems: 'center',
+      paddingVertical: spacing.md,
+      marginTop: spacing.sm,
+    },
+    signOutText: { ...typography.bodyBold, color: colors.danger },
+  });
+}

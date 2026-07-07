@@ -1,4 +1,22 @@
-export const colors = {
+export const lightColors: Record<
+  | 'background'
+  | 'backgroundAlt'
+  | 'card'
+  | 'primary'
+  | 'primaryDark'
+  | 'primaryLight'
+  | 'secondary'
+  | 'accent'
+  | 'text'
+  | 'textMuted'
+  | 'textOnPrimary'
+  | 'border'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'track',
+  string
+> = {
   background: '#EAF4FE',
   backgroundAlt: '#DCEBFC',
   card: '#FFFFFF',
@@ -15,13 +33,31 @@ export const colors = {
   warning: '#F5A623',
   danger: '#EF5A5A',
   track: '#D9E9FC',
-  night: '#3A4A73',
-} as const;
-
-export const gradients = {
-  primary: ['#5CA8F2', '#2E6DC7'] as const,
-  drop: ['#7FD3E8', '#4A90E2'] as const,
 };
+
+export const darkColors: typeof lightColors = {
+  background: '#0F1B2E',
+  backgroundAlt: '#16243B',
+  card: '#1B2A45',
+  primary: '#5CA8F2',
+  primaryDark: '#3D7FC9',
+  primaryLight: '#8EC3F5',
+  secondary: '#7FD3E8',
+  accent: '#3AB6E8',
+  text: '#F0F5FF',
+  textMuted: '#93A6C4',
+  textOnPrimary: '#FFFFFF',
+  border: '#2A3B57',
+  success: '#4ADE9E',
+  warning: '#F5A623',
+  danger: '#FF6B6B',
+  track: '#22334D',
+};
+
+export type ThemeColors = typeof lightColors;
+
+/** Static light palette — used by screens that aren't theme-reactive (auth flow, onboarding). */
+export const colors = lightColors;
 
 export const spacing = {
   xs: 4,
@@ -40,22 +76,27 @@ export const radius = {
   pill: 999,
 } as const;
 
-export const shadow = {
-  card: {
-    shadowColor: '#2E6DC7',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  soft: {
-    shadowColor: '#1B2A4A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-} as const;
+export function getShadow(colors: ThemeColors) {
+  return {
+    card: {
+      shadowColor: colors.primaryDark,
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.1,
+      shadowRadius: 12,
+      elevation: 4,
+    },
+    soft: {
+      shadowColor: colors.text,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 6,
+      elevation: 2,
+    },
+  } as const;
+}
+
+/** Static shadow (light theme) — used by non-theme-reactive screens. */
+export const shadow = getShadow(lightColors);
 
 export const typography = {
   h1: { fontSize: 28, fontWeight: '700' as const },

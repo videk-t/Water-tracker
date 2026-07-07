@@ -12,11 +12,16 @@ interface RemindersContextValue {
   reminders: Reminder[];
   loading: boolean;
   refresh: () => Promise<void>;
-  addReminder: (time: string, daysOfWeek: number[], sound?: ReminderSound) => Promise<void>;
+  addReminder: (
+    time: string,
+    daysOfWeek: number[],
+    sound?: ReminderSound,
+    message?: string | null
+  ) => Promise<void>;
   toggleReminder: (id: string, enabled: boolean) => Promise<void>;
   editReminder: (
     id: string,
-    patch: Partial<Pick<Reminder, 'time' | 'days_of_week' | 'enabled' | 'sound'>>
+    patch: Partial<Pick<Reminder, 'time' | 'days_of_week' | 'enabled' | 'sound' | 'message'>>
   ) => Promise<void>;
   removeReminder: (id: string) => Promise<void>;
 }
@@ -49,9 +54,14 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
   }, [refresh]);
 
   const addReminder = useCallback(
-    async (time: string, daysOfWeek: number[], sound: ReminderSound = 'default') => {
+    async (
+      time: string,
+      daysOfWeek: number[],
+      sound: ReminderSound = 'default',
+      message: string | null = null
+    ) => {
       if (!userId) return;
-      const created = await createReminder(userId, time, daysOfWeek, sound);
+      const created = await createReminder(userId, time, daysOfWeek, sound, message);
       setReminders((prev) => [...prev, created].sort((a, b) => a.time.localeCompare(b.time)));
     },
     [userId]
@@ -63,7 +73,10 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const editReminder = useCallback(
-    async (id: string, patch: Partial<Pick<Reminder, 'time' | 'days_of_week' | 'enabled' | 'sound'>>) => {
+    async (
+      id: string,
+      patch: Partial<Pick<Reminder, 'time' | 'days_of_week' | 'enabled' | 'sound' | 'message'>>
+    ) => {
       const updated = await updateReminder(id, patch);
       setReminders((prev) =>
         prev.map((r) => (r.id === id ? updated : r)).sort((a, b) => a.time.localeCompare(b.time))

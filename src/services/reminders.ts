@@ -16,11 +16,12 @@ export async function createReminder(
   userId: string,
   time: string,
   daysOfWeek: number[],
-  sound: ReminderSound = 'default'
+  sound: ReminderSound = 'default',
+  message: string | null = null
 ): Promise<Reminder> {
   const { data, error } = await supabase
     .from('reminders')
-    .insert({ user_id: userId, time, days_of_week: daysOfWeek, sound, enabled: true })
+    .insert({ user_id: userId, time, days_of_week: daysOfWeek, sound, message, enabled: true })
     .select()
     .single();
 
@@ -30,7 +31,7 @@ export async function createReminder(
 
 export async function updateReminder(
   id: string,
-  patch: Partial<Pick<Reminder, 'time' | 'days_of_week' | 'enabled' | 'sound'>>
+  patch: Partial<Pick<Reminder, 'time' | 'days_of_week' | 'enabled' | 'sound' | 'message'>>
 ): Promise<Reminder> {
   const { data, error } = await supabase
     .from('reminders')
