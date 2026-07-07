@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BackHeader from '../../components/BackHeader';
 import Button from '../../components/Button';
@@ -64,6 +73,7 @@ export default function PersonalDataScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.flex}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <BackHeader title="Personal Data" />
 
@@ -111,12 +121,14 @@ export default function PersonalDataScreen() {
 
         <Button label="Save Changes" onPress={handleSave} loading={saving} />
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
+  flex: { flex: 1 },
   scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
   title: { ...typography.h2, color: colors.text, marginBottom: spacing.md },
   card: { marginBottom: spacing.lg },

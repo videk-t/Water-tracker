@@ -33,7 +33,7 @@ export default function ForgotPasswordScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.flex}>
         <View style={styles.content}>
           <Text style={styles.title}>Forgot password?</Text>
           <Text style={styles.subtitle}>

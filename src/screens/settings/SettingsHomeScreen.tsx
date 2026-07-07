@@ -142,7 +142,7 @@ function ModePill({
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
+  scroll: { padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xxl },
   title: { ...typography.h2, color: colors.text, marginBottom: spacing.md },
   card: { marginBottom: spacing.md },
   sectionLabel: { ...typography.caption, color: colors.textMuted, marginBottom: spacing.sm },

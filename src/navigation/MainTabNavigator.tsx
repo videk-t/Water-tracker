@@ -1,5 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TabIcon from '../components/TabIcon';
 import HomeScreen from '../screens/home/HomeScreen';
 import HistoryScreen from '../screens/history/HistoryScreen';
@@ -10,6 +11,9 @@ import { MainTabParamList } from './types';
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabNavigator() {
+  const insets = useSafeAreaInsets();
+  const bottomInset = Math.max(insets.bottom, 12);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -19,8 +23,8 @@ export default function MainTabNavigator() {
         tabBarStyle: {
           backgroundColor: colors.card,
           borderTopColor: colors.border,
-          height: 64,
-          paddingBottom: 8,
+          height: 56 + bottomInset,
+          paddingBottom: bottomInset,
           paddingTop: 8,
         },
         tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },

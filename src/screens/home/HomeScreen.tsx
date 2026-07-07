@@ -109,7 +109,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
+  scroll: { padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xxl },
   greeting: { ...typography.h2, color: colors.text, marginBottom: spacing.md },
   ringWrapper: { alignItems: 'center', marginBottom: spacing.lg },
   mascotCard: {
