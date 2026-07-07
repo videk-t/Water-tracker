@@ -15,3 +15,9 @@
    EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
    EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    ```
+5. **Password reset uses a 6-digit code instead of an email link**, since the app has no
+   website to redirect a magic link back to. In **Authentication → Email Templates → Reset
+   Password**, edit the template so it shows `{{ .Token }}` as plain text (e.g. add a line like
+   `Your code is: {{ .Token }}`) instead of relying solely on `{{ .ConfirmationURL }}`. Without
+   this change, `ForgotPasswordScreen` will send an email but the code shown in
+   `ResetPasswordScreen` won't match anything.

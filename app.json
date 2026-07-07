@@ -1,15 +1,19 @@
 {
   "expo": {
-    "name": "Water-tracker",
-    "slug": "Water-tracker",
+    "name": "HydroTrack",
+    "slug": "hydrotrack",
+    "scheme": "hydrotrack",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vip.hydrotrack"
     },
     "android": {
+      "package": "com.vip.hydrotrack",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",

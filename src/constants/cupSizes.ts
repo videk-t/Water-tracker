@@ -13,4 +13,6 @@ export const WEEKDAY_LABELS_FULL = [
 
 export const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
 
-export const REMINDER_SOUNDS = ['default', 'droplet', 'chime', 'bell', 'none'] as const;
+// Only these two are wired to real behavior in services/notifications.ts — there are no
+// bundled custom audio files, so "droplet/chime/bell" would silently fall back to default.
+export const REMINDER_SOUNDS = ['default', 'none'] as const;

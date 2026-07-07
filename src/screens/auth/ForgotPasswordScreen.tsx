@@ -8,34 +8,24 @@ import { useAuth } from '../../context/AuthContext';
 import { colors, spacing, typography } from '../../constants/theme';
 import { AuthStackParamList } from '../../navigation/types';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'SignUp'>;
+type Props = NativeStackScreenProps<AuthStackParamList, 'ForgotPassword'>;
 
-export default function SignUpScreen({ navigation }: Props) {
-  const { signUpWithEmail } = useAuth();
+export default function ForgotPasswordScreen({ navigation }: Props) {
+  const { requestPasswordReset } = useAuth();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!email || !password) {
-      Alert.alert('Missing info', 'Enter your email and password.');
-      return;
-    }
-    if (password.length < 6) {
-      Alert.alert('Weak password', 'Password must be at least 6 characters.');
+    if (!email) {
+      Alert.alert('Missing info', 'Enter the email on your account.');
       return;
     }
     setLoading(true);
     try {
-      const signedIn = await signUpWithEmail(email.trim(), password);
-      if (!signedIn) {
-        Alert.alert('Almost there', 'Check your email to confirm your account, then sign in.');
-        navigation.navigate('SignIn');
-      }
-      // If signedIn is true, the auth state change already logs the user in —
-      // RootNavigator will swap away from this screen on its own.
+      await requestPasswordReset(email.trim());
+      navigation.navigate('ResetPassword', { email: email.trim() });
     } catch (e: any) {
-      Alert.alert('Sign up failed', e.message ?? 'Please try again.');
+      Alert.alert('Could not send code', e.message ?? 'Please try again.');
     } finally {
       setLoading(false);
     }
@@ -43,13 +33,12 @@ export default function SignUpScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.flex}
-      >
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
         <View style={styles.content}>
-          <Text style={styles.title}>Create your account</Text>
-          <Text style={styles.subtitle}>Track your hydration across every device.</Text>
+          <Text style={styles.title}>Forgot password?</Text>
+          <Text style={styles.subtitle}>
+            We'll email you a 6-digit code to reset your password.
+          </Text>
 
           <View style={styles.form}>
             <TextField
@@ -60,14 +49,7 @@ export default function SignUpScreen({ navigation }: Props) {
               onChangeText={setEmail}
               placeholder="you@example.com"
             />
-            <TextField
-              label="Password"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-              placeholder="At least 6 characters"
-            />
-            <Button label="Create Account" onPress={handleSubmit} loading={loading} />
+            <Button label="Send Code" onPress={handleSubmit} loading={loading} />
             <Button
               label="Back"
               variant="ghost"

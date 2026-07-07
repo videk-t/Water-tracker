@@ -44,6 +44,19 @@ A water intake tracker built with Expo, React Native, and Supabase.
    Local push notifications require a development build or Expo Go on a
    physical device/simulator with notification permissions granted.
 
+## Building for the Play Store
+
+1. `npm install --save-dev eas-cli && npx eas login`
+2. Fill in `PRIVACY.md` (replace the `[bracketed]` placeholders) and host it somewhere public
+   — the Play Console requires a live privacy policy URL before you can submit.
+3. `android.package` in `app.json` is set to `com.vip.hydrotrack`; change it if you want a
+   different app ID (it must be globally unique on the Play Store).
+4. Build a release bundle: `npx eas build --platform android --profile production` (see
+   `eas.json` for build profiles — `development` and `preview` produce installable APKs for
+   testing, `production` produces the `.aab` the Play Console expects).
+5. Complete the Play Console listing: screenshots, description, content rating
+   questionnaire, and the privacy policy URL from step 2.
+
 ## Project structure
 
 ```

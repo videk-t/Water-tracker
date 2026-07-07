@@ -1,7 +1,7 @@
 export type Unit = 'ml' | 'oz';
 export type Gender = 'male' | 'female' | 'other';
 export type ReminderMode = 'auto' | 'manual';
-export type ReminderSound = 'default' | 'droplet' | 'chime' | 'bell' | 'none';
+export type ReminderSound = 'default' | 'none';
 
 export interface Profile {
   id: string;

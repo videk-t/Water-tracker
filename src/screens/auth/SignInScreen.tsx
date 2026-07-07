@@ -59,6 +59,12 @@ export default function SignInScreen({ navigation }: Props) {
             />
             <Button label="Sign In" onPress={handleSubmit} loading={loading} />
             <Button
+              label="Forgot password?"
+              variant="ghost"
+              onPress={() => navigation.navigate('ForgotPassword')}
+              style={styles.spaced}
+            />
+            <Button
               label="Back"
               variant="ghost"
               onPress={() => navigation.goBack()}

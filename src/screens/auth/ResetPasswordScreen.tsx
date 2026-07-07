@@ -8,34 +8,30 @@ import { useAuth } from '../../context/AuthContext';
 import { colors, spacing, typography } from '../../constants/theme';
 import { AuthStackParamList } from '../../navigation/types';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'SignUp'>;
+type Props = NativeStackScreenProps<AuthStackParamList, 'ResetPassword'>;
 
-export default function SignUpScreen({ navigation }: Props) {
-  const { signUpWithEmail } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function ResetPasswordScreen({ route, navigation }: Props) {
+  const { confirmPasswordReset } = useAuth();
+  const { email } = route.params;
+  const [otp, setOtp] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!email || !password) {
-      Alert.alert('Missing info', 'Enter your email and password.');
+    if (!otp || !newPassword) {
+      Alert.alert('Missing info', 'Enter the code from your email and a new password.');
       return;
     }
-    if (password.length < 6) {
+    if (newPassword.length < 6) {
       Alert.alert('Weak password', 'Password must be at least 6 characters.');
       return;
     }
     setLoading(true);
     try {
-      const signedIn = await signUpWithEmail(email.trim(), password);
-      if (!signedIn) {
-        Alert.alert('Almost there', 'Check your email to confirm your account, then sign in.');
-        navigation.navigate('SignIn');
-      }
-      // If signedIn is true, the auth state change already logs the user in —
-      // RootNavigator will swap away from this screen on its own.
+      await confirmPasswordReset(email, otp.trim(), newPassword);
+      // A successful reset also signs the user in — RootNavigator takes over from here.
     } catch (e: any) {
-      Alert.alert('Sign up failed', e.message ?? 'Please try again.');
+      Alert.alert('Could not reset password', e.message ?? 'Please try again.');
     } finally {
       setLoading(false);
     }
@@ -43,31 +39,30 @@ export default function SignUpScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.flex}
-      >
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
         <View style={styles.content}>
-          <Text style={styles.title}>Create your account</Text>
-          <Text style={styles.subtitle}>Track your hydration across every device.</Text>
+          <Text style={styles.title}>Check your email</Text>
+          <Text style={styles.subtitle}>
+            Enter the 6-digit code we sent to {email} and choose a new password.
+          </Text>
 
           <View style={styles.form}>
             <TextField
-              label="Email"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="you@example.com"
+              label="Code"
+              keyboardType="number-pad"
+              value={otp}
+              onChangeText={setOtp}
+              placeholder="123456"
+              maxLength={6}
             />
             <TextField
-              label="Password"
+              label="New password"
               secureTextEntry
-              value={password}
-              onChangeText={setPassword}
+              value={newPassword}
+              onChangeText={setNewPassword}
               placeholder="At least 6 characters"
             />
-            <Button label="Create Account" onPress={handleSubmit} loading={loading} />
+            <Button label="Reset Password" onPress={handleSubmit} loading={loading} />
             <Button
               label="Back"
               variant="ghost"
