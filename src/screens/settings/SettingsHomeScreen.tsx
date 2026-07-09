@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -7,10 +7,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useProfile } from '../../context/ProfileContext';
 import { useReminders } from '../../context/RemindersContext';
 import { useTheme } from '../../context/ThemeContext';
-import { ALL_DAYS } from '../../constants/cupSizes';
-import { generateAutoScheduleTimes } from '../../services/reminders';
 import { radius, spacing, typography, ThemeColors } from '../../constants/theme';
-import { ReminderMode, ThemePreference, Unit } from '../../types';
+import { Unit } from '../../types';
 import { SettingsStackParamList } from '../../navigation/types';
 
 type Props = NativeStackScreenProps<SettingsStackParamList, 'SettingsHome'>;
@@ -20,28 +18,10 @@ export default function SettingsHomeScreen({ navigation }: Props) {
   const styles = useMemo(() => getStyles(colors), [colors]);
   const { session, signOut } = useAuth();
   const { profile, updateProfile } = useProfile();
-  const { reminders, addReminder } = useReminders();
+  const { reminders } = useReminders();
   const { preference, setPreference } = useTheme();
-  const [switchingMode, setSwitchingMode] = useState(false);
 
   const handleUnitChange = (unit: Unit) => updateProfile({ unit });
-
-  const handleModeChange = async (mode: ReminderMode) => {
-    setSwitchingMode(true);
-    try {
-      await updateProfile({ reminder_mode: mode });
-      if (mode === 'auto' && reminders.length === 0) {
-        const times = generateAutoScheduleTimes();
-        for (const time of times) {
-          await addReminder(time, ALL_DAYS, 'default');
-        }
-      }
-    } catch (e: any) {
-      Alert.alert('Could not update reminder mode', e.message ?? 'Please try again.');
-    } finally {
-      setSwitchingMode(false);
-    }
-  };
 
   const handleSignOut = () => {
     Alert.alert('Sign out', 'Are you sure you want to sign out?', [
@@ -67,27 +47,6 @@ export default function SettingsHomeScreen({ navigation }: Props) {
             <ModePill label="Light" active={preference === 'light'} onPress={() => setPreference('light')} />
             <ModePill label="Dark" active={preference === 'dark'} onPress={() => setPreference('dark')} />
           </View>
-        </Card>
-
-        <Card style={styles.card}>
-          <Text style={styles.sectionLabel}>Reminder Mode</Text>
-          <View style={styles.row}>
-            <ModePill
-              label="Auto"
-              active={profile?.reminder_mode === 'auto'}
-              onPress={() => handleModeChange('auto')}
-              disabled={switchingMode}
-            />
-            <ModePill
-              label="Manual"
-              active={profile?.reminder_mode === 'manual'}
-              onPress={() => handleModeChange('manual')}
-              disabled={switchingMode}
-            />
-          </View>
-          <Text style={styles.hint}>
-            Auto fills your schedule with evenly spaced reminders. Manual leaves it entirely up to you.
-          </Text>
         </Card>
 
         <Card style={styles.card}>

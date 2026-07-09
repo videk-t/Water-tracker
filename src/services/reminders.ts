@@ -48,16 +48,3 @@ export async function deleteReminder(id: string): Promise<void> {
   const { error } = await supabase.from('reminders').delete().eq('id', id);
   if (error) throw error;
 }
-
-/** Evenly spaced reminder times (e.g. every 2h from 08:00 to 20:00) for "Auto" mode. */
-export function generateAutoScheduleTimes(
-  startHour = 8,
-  endHour = 20,
-  intervalHours = 2
-): string[] {
-  const times: string[] = [];
-  for (let h = startHour; h <= endHour; h += intervalHours) {
-    times.push(`${String(h).padStart(2, '0')}:00:00`);
-  }
-  return times;
-}
